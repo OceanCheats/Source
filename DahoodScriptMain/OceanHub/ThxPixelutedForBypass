@@ -53,10 +53,81 @@ MiscTab:AddButton({Name = "FPS Boost", Callback = function() setfflag("DFIntTask
 MiscTab:AddButton({Name = "HipHeight", Callback = function() setfflag("DFIntMaxAltitudePDStickHipHeightPercent", "-200") end})
 
 local ResolverSection = MiscTab:AddSection({Name = "Resolver"})
-MiscTab:AddButton({Name = "ResolverV1", Callback = function() print("ResolverV1 placeholder") end})
+MiscTab:AddButton({Name = "ResolverV1", Callback = function() local previousPosition = nil
+    local previousTime = nil
+
+    local function NewVelocity(object)
+        local currentPosition = object.Position
+        local currentTime = tick()
+
+        if previousPosition and previousTime then
+            local deltaTime = currentTime - previousTime
+            local velocity = (currentPosition - previousPosition) / deltaTime
+
+            object.Velocity = velocity
+        end
+
+        previousPosition = currentPosition
+        previousTime = currentTime
+    end
+
+    RunService.Heartbeat:Connect(function()
+        if Target and Target.Character and Target.Character:FindFirstChild(IHateNiggers.Silent.AimPart).Velocity.magnitude > IHateNiggers.Resolving.Velocity then
+            NewVelocity(Target.Character[IHateNiggers.Silent.AimPart])
+        end
+    end) end})
 MiscTab:AddButton({Name = "ResolverV2", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/FeliciaXxxTop/FuckRoblox/main/ResolverV1.lua"))() end})
-MiscTab:AddButton({Name = "ResolverV3", Callback = function() print("ResolverV3 placeholder") end})
-MiscTab:AddButton({Name = "ResolverV4", Callback = function() print("ResolverV4 placeholder") end})
+MiscTab:AddButton({Name = "ResolverV3", Callback = function() local Players = game:GetService("Players")
+
+local function calculateVelocity(humanoid)
+    local lastPosition = humanoid.RootPart.Position
+    local lastTime = tick()
+
+    return function()
+        local currentPosition = humanoid.RootPart.Position
+        local currentTime = tick()
+        local deltaTime = currentTime - lastTime
+
+        local predictedVelocity = (currentPosition - lastPosition) / deltaTime
+
+        lastPosition = currentPosition
+        lastTime = currentTime
+
+        return predictedVelocity
+    end
+end
+
+local function updateHumanoidVelocity(player)
+    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        local velocityFunc = calculateVelocity(humanoid)
+
+        humanoid:GetPropertyChangedSignal("RootPart"):Connect(function()
+            local velocity = velocityFunc()
+
+            humanoid.WalkSpeed = velocity.magnitude * 0.132
+            humanoid.MoveDirection = velocity.unit
+        end)
+    end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    updateHumanoidVelocity(player)
+end
+
+Players.PlayerAdded:Connect(updateHumanoidVelocity) end})
+MiscTab:AddButton({Name = "ResolverV4", Callback = function() while true do
+    heartbeat:Wait()
+    if target == true then
+        local character = game.Players[targetplr].Character.HumanoidRootPart
+        local lastPosition = character.Position
+        task.wait()
+        local currentPosition = character.Position
+        local velocity = (currentPosition - lastPosition) * 0
+        character.AssemblyLinerVelocity = velocity
+        character.Velocity = velocity
+    end
+end
 
 OrionLib:MakeNotification({
     Name = "Ocean Hub",
